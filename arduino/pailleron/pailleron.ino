@@ -21,7 +21,7 @@
 #define soundSensor A0
 
 int soundValue;
-const int threshold = 60;
+const int threshold = 20;
 
 void setup() {
 
@@ -65,17 +65,37 @@ void loop() {
     frame = 10;
   }
 
-    if(count == 2){
+    /*if(count == 2){
       motor_standby(false);
       motor_control(1,100);
       delay(500);
       motor_standby(true);
 
       count = 0;
-    }
+    }*/
   
   if(frame > 0){frame--;}
-  if(frame == 0){count = 0;}
+  if(frame == 0){
+
+    if(count <= 2 && count > 1){
+      motor_standby(false);
+      motor_control(1,100);
+      delay(500);
+      motor_standby(true);
+    } else if (count >= 3){
+     
+      if(digitalRead(limitSwitch) == LOW){
+        motor_standby(false);
+        motor_control(0,100);
+        delay(500);
+        motor_standby(true);
+      }
+    }
+    
+    count = 0;
+  
+  
+  }
 
   delay(50);
 
