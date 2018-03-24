@@ -21,7 +21,7 @@
 #define soundSensor A0
 
 int soundValue;
-const int threshold = 20; //sensibilité du micro
+const int threshold = 20;
 
 void setup() {
 
@@ -45,7 +45,7 @@ void setup() {
     motor_control(0,100);
   }
   motor_control(1,30);
-  delay(5000); //temps pour être au centre du fil (boucle de démarage)
+  delay(3000);
   motor_standby(true);
 
   Serial.println("Ready!");
@@ -53,7 +53,6 @@ void setup() {
 
 int count = 0;
 int frame = 10;
-int mov = 0;
 
 void loop() {
 
@@ -66,43 +65,40 @@ void loop() {
     frame = 10;
   }
 
-  if(digitalRead(limitSwitch) == HIGH){
-      motor_standby(false);
-      motor_control(1,30);
-      delay(5000);  //temps pour être au centre du fil (bouton touché)
-      motor_standby(true);
-      mov = 0;
-  }
-      
-  if(frame > 0){frame--;}
-  
-  if(frame == 0){
-    if(count <= 2 && count >= 1){ // 2 claps bas
-      motor_standby(false);
-      motor_control(0,100);
-      delay(500);
-      motor_standby(true);
-      mov--;
-    } else if (count >= 3){ // 3 claps haut
+    /*if(count == 2){
       motor_standby(false);
       motor_control(1,100);
       delay(500);
       motor_standby(true);
-      mov++;
+
+      count = 0;
+    }*/
+  
+  if(frame > 0){frame--;}
+  if(frame == 0){
+
+    if(count <= 2 && count > 1){
+      motor_standby(false);
+      motor_control(1,100);
+      delay(500);
+      motor_standby(true);
+    } else if (count >= 3){
+     
+      if(digitalRead(limitSwitch) == LOW){
+        motor_standby(false);
+        motor_control(0,100);
+        delay(500);
+        motor_standby(true);
+      }
     }
-    count = 0;  
+    
+    count = 0;
+  
+  
   }
 
-  if(mov > 10){ //après 10 claps haut retour à l'origine
-    motor_standby(false);
-    motor_control(0,30);
-    delay(5000);
-    motor_standby(true);
-    mov = 0;  
-  }
-  
   delay(50);
-  Serial.println("frame : "+String(frame)+" conut : "+String(count)+" mov : "+mov);
+  Serial.println("frame : "+String(frame)+" conut : "+String(count));
 }
 
 void motor_control(boolean direction, char speed){ //speed from 0 to 100
